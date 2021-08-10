@@ -33,7 +33,7 @@ const router = express.Router();
 
 // base route
 router.get('/', async (req, res) => {
-  res.send(`app running`)
+  res.send(`Osobní Archeologie API is running well.`)
 })
 
 // server use lambda
