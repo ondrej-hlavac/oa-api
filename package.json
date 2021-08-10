@@ -3,6 +3,11 @@
   "version": "0.0.1",
   "description": "osobni archeologie api",
   "main": "functions/server.js",
+  "scripts": {
+    "build": "netlify-lambda build express",
+    "start": "nodemon server-local.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "repository": "git@github.com:ondrej-hlavac/oa-api.git",
   "author": "ondrej.hlavac@outlook.com",
   "license": "Perpetual",
