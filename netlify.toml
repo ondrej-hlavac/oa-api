@@ -1,0 +1,6 @@
+[build]
+  command = "npm install && npm run build"
+  functions = "functions"
+
+[context.production]
+  environment = { FAUNADB_SECRET="fnAEM2Ky3MACDpggWeD-AlIHQWq0X5ZaS7y9iXwz", API_KEY="mACOd2no1kolO8cWArmtITfv" }

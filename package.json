@@ -1,0 +1,20 @@
+{
+  "name": "oa-api",
+  "version": "0.0.1",
+  "description": "osobni archeologie api",
+  "main": "functions/server.js",
+  "repository": "git@github.com:ondrej-hlavac/oa-api.git",
+  "author": "ondrej.hlavac@outlook.com",
+  "license": "Perpetual",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dotenv": "^10.0.0",
+    "encoding": "^0.1.13",
+    "express": "^4.17.1",
+    "faunadb": "^4.3.0",
+    "netlify-lambda": "^2.0.14",
+    "nodemon": "^2.0.12",
+    "serverless-http": "^2.7.0"
+  }
+}
