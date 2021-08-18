@@ -2,19 +2,22 @@
 require('encoding');
 const express = require('express');
 const path = require('path');
-const faunadb = require('faunadb');
 const serverless = require('serverless-http');
-
-// read .env
-require('dotenv').config();
 
 // init server app
 const app = express();
 app.use(express.json());
 
+// read .env
+require('dotenv').config();
+
 // init db client
-const client = new faunadb.Client({ secret: process.env.FAUNADB_SECRET });
-console.log("🚀 ~ file: server.js ~ line 20 ~ process.env.FAUNADB_SECRET", process.env.FAUNADB_SECRET)
+const faunadb = require('faunadb');
+const client = new faunadb.Client({ 
+  secret: process.env.FAUNADB_SECRET,
+  domain: 'db.eu.fauna.com',
+  scheme: 'https', 
+});
 
 // // db queries
 const {
@@ -24,8 +27,10 @@ const {
   Index,
   Map,
   Create,
+  Ref,
   Collection,
   Lambda,
+  Select,
   Var
 } = faunadb.query;
 
@@ -35,7 +40,7 @@ const router = express.Router();
 
 // FINDINGS
 
-// create
+// FINDINGS create
 router.post('/findings', async (req, res) => {
 
   // if (!req.headers.authentication) {
@@ -46,7 +51,7 @@ router.post('/findings', async (req, res) => {
   //   res.send(401, 'unauthorized request');
   // }
 
-  console.log("🚀 ~ file: server.js ~ line 42 ~ app.post ~ req", req.body)
+  // const { tags } = params;
 
   const doc = await client.query(
     Create(
@@ -63,26 +68,165 @@ router.post('/findings', async (req, res) => {
   res.send(doc);
 });
 
-// read
+// FINDINGS read
 router.get('/findings', async (req, res) => {
-
   const doc = await client.query(
-    Map(
-      Paginate(
-        Match(Index("all_findings"))
-      ),
-      Lambda("X", Get(Var("X")))
+      Map(
+        Paginate(
+          Match(Index("all_findings"))
+        ),
+        Lambda("X", Get(Var("X")))
+      )
     )
-  ).catch((e) => console.log(e))
-
-  return res.json(doc)
+    .catch((e) => console.log(e));
+        
+  return res.json(doc);
 });
 
-// find by tag
+// FINDINGS find by ID
+router.get('/finding/:id', async (req, res) => {
+  console.log("🚀 ~ file: server.js ~ line 41 ~ router.get ~ req", req)
 
-// update
+  const doc = await client.query(
+      Get(
+        Ref(
+          Collection("findings"),
+          req.params.id
+        )
+      )
+    )
+    .catch((e) => console.log(e));
+        
+  return res.json(doc);
+});
 
-// delete
+// FINDINGS find by tag
+
+// FINDINGS update
+
+// FINDINGS delete
+
+
+// TAGS
+
+// TAGS create
+router.post('/tags', async (req, res) => {
+
+  // if (!req.headers.authentication) {
+  //   res.send(400, 'missing authorization header');
+  // }
+
+  // if (req.headers.authentication !== process.env.API_KEY) {
+  //   res.send(401, 'unauthorized request');
+  // }
+
+  const doc = await client.query(
+    Create(
+      Collection('tags'),
+      {
+        data: {
+          ...req.body
+        }
+      }
+    )
+  )
+  .catch((e) => res.send(e))
+
+  res.send(doc);
+});
+
+// TAGS read
+router.get('/tags', async (req, res) => {
+  const doc = await client.query(
+      Map(
+        Paginate(
+          Match(Index("all_tags"))
+        ),
+        Lambda("X", Get(Var("X")))
+      )
+    ).catch((e) => console.log(e));
+  return res.json(doc);
+});
+
+// TAGS find by id
+router.get('/tag/:id', async (req, res) => {
+  const doc = await client.query(
+      Get(
+        Ref(
+          Collection("tags"),
+          req.params.id
+        )
+      )
+    ).catch((e) => console.log(e));
+  return res.json(doc);
+});
+
+// RELATIONS
+
+// RELATION create
+router.post('/relation', async (req, res) => {
+
+  // if (!req.headers.authentication) {
+  //   res.send(400, 'missing authorization header');
+  // }
+
+  // if (req.headers.authentication !== process.env.API_KEY) {
+  //   res.send(401, 'unauthorized request');
+  // }
+
+  const { finding, tag } = req.body;
+  console.log("🚀 ~ file: server.js ~ line 177 ~ router.post ~ tag", tag, finding)
+
+  // const connectionFinding = Select('ref', Get(Match(Index('findings'), finding)));
+  // const connectionTag = Select('ref', Get(Match(Index('tags'), tag)));
+
+  const doc = await client.query(
+    Create(
+      Collection('relations'),
+      {
+        data: {
+          finding: Select('ref', Get(
+            Ref(
+              Collection("findings"),
+              finding
+            )
+          )),
+          tag: Select('ref', Get(
+            Ref(
+              Collection("tags"),
+              tag
+            )
+          )),
+        }
+      }
+    )
+  )
+  .catch((e) => res.send(e))
+
+  res.send(doc);
+});
+
+// RELATION read
+router.get('/relations', async (req, res) => {
+  const doc = await client.query(
+      Map(
+        Paginate(
+          Match(Index("all_relations"))
+        ),
+        Lambda("X", Get(Var("X")))
+      )
+    ).catch((e) => console.log(e));
+  return res.json(doc);
+});
+
+// RELATION delete
+router.delete('/relation', async (req, res) => {
+  const doc = await client.query(
+    Delete(q.Ref(q.Collection('relations'), req.body.id))
+  )
+
+  res.send(doc);
+})
 
 
 // base route
