@@ -25,13 +25,16 @@ const {
   Get,
   Match,
   Index,
+  Join,
   Map,
   Create,
   Ref,
   Collection,
   Lambda,
   Select,
-  Var
+  Var,
+  Call,
+  Function: Fn
 } = faunadb.query;
 
 // init express router
@@ -101,6 +104,27 @@ router.get('/finding/:id', async (req, res) => {
 });
 
 // FINDINGS find by tag
+router.get('/findings-by-tag/:id', async (req, res) => {
+
+  const docs = await client.query(
+    Paginate(
+      Join(
+        Match(
+          Index('findings_by_tag'),
+          Get(
+            Ref(
+              Collection("findings"),
+              req.params.id
+            )
+          )
+        ),
+        Index("findings")
+      )
+    )
+  ).catch((e) => console.log(e));
+  
+  res.json(docs)
+})
 
 // FINDINGS update
 
@@ -111,6 +135,8 @@ router.get('/finding/:id', async (req, res) => {
 
 // TAGS create
 router.post('/tags', async (req, res) => {
+
+  console.log('post taks')
 
   // if (!req.headers.authentication) {
   //   res.send(400, 'missing authorization header');
@@ -175,7 +201,6 @@ router.post('/relation', async (req, res) => {
   // }
 
   const { finding, tag } = req.body;
-  console.log("🚀 ~ file: server.js ~ line 177 ~ router.post ~ tag", tag, finding)
 
   // const connectionFinding = Select('ref', Get(Match(Index('findings'), finding)));
   // const connectionTag = Select('ref', Get(Match(Index('tags'), tag)));
