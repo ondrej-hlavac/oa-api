@@ -11,7 +11,7 @@ app.use(express.json());
 // app.use(cors({origin: false}))
 
 const allowedOrigins = ['http://localhost:3000',
-  'https://festive-carson-cbfab3.netlify.app'];
+  'https://jolly-johnson-99d9ab.netlify.app'];
 app.use(cors({
   origin: function(origin, callback){
     // allow requests with no origin
