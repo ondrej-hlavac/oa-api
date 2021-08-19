@@ -13,7 +13,9 @@
   "license": "Perpetual",
   "private": true,
   "dependencies": {
+    "@types/cors": "^2.8.12",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "encoding": "^0.1.13",
     "express": "^4.17.1",
