@@ -203,6 +203,62 @@ router.get('/tag/:id', async (req, res) => {
   return res.json(doc);
 });
 
+// TIME TAGS
+
+// TIME TAGS create
+router.post('/time-tags', async (req, res) => {
+
+  console.log('post taks')
+
+  // if (!req.headers.authentication) {
+  //   res.send(400, 'missing authorization header');
+  // }
+
+  // if (req.headers.authentication !== process.env.API_KEY) {
+  //   res.send(401, 'unauthorized request');
+  // }
+
+  const doc = await client.query(
+    Create(
+      Collection('timeTags'),
+      {
+        data: {
+          ...req.body
+        }
+      }
+    )
+  )
+  .catch((e) => res.send(e))
+
+  res.send(doc);
+});
+
+// TIME TAGS read
+router.get('/time-tags', async (req, res) => {
+  const doc = await client.query(
+      Map(
+        Paginate(
+          Match(Index("all_time_tags"))
+        ),
+        Lambda("X", Get(Var("X")))
+      )
+    ).catch((e) => console.log(e));
+  return res.json(doc);
+});
+
+// TIME TAGS find by id
+router.get('/time-tags/:id', async (req, res) => {
+  const doc = await client.query(
+      Get(
+        Ref(
+          Collection("timeTags"),
+          req.params.id
+        )
+      )
+    ).catch((e) => console.log(e));
+  return res.json(doc);
+});
+
 // RELATIONS
 
 // RELATION create
