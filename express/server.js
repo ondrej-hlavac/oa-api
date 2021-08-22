@@ -11,11 +11,9 @@ app.use(express.json());
 // app.use(cors({origin: false}))
 
 const allowedOrigins = ['http://localhost:3000',
-  'https://festive-carson-cbfab3.netlify.app'];
+  'https://osobniarcheologie.netlify.app/'];
 app.use(cors({
   origin: function(origin, callback){
-    // allow requests with no origin
-    // (like mobile apps or curl requests)
     if(!origin) return callback(null, true);
     if(allowedOrigins.indexOf(origin) === -1){
       let msg = 'The CORS policy for this site does not ' +
