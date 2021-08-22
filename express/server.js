@@ -11,7 +11,7 @@ app.use(express.json());
 // app.use(cors({origin: false}))
 
 const allowedOrigins = ['http://localhost:3000',
-  'https://osobniarcheologie.netlify.app/'];
+  'https://osobniarcheologie.netlify.app'];
 app.use(cors({
   origin: function(origin, callback){
     if(!origin) return callback(null, true);
