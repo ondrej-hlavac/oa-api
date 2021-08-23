@@ -71,13 +71,26 @@ router.post('/findings', async (req, res) => {
   // }
 
   // const { tags } = params;
+  const { basicTagId, timeTagId } = req.body;
 
   const doc = await client.query(
     Create(
       Collection('findings'),
       {
         data: {
-          ...req.body
+          ...req.body,
+          basicTag: Select('ref', Get(
+            Ref(
+              Collection("tags"),
+              basicTagId
+            )
+          )),
+          timeTag: Select('ref', Get(
+            Ref(
+              Collection("timeTags"),
+              timeTagId
+            )
+          )),
         }
       }
     )
