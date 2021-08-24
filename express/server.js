@@ -43,13 +43,14 @@ const {
   Index,
   Join,
   Map,
+  IsRef,
   Create,
   Ref,
   Collection,
   Lambda,
   Select,
   Var,
-  Call,
+  Filter,
   Function: Fn
 } = faunadb.query;
 
@@ -103,12 +104,25 @@ router.post('/findings', async (req, res) => {
 // FINDINGS read
 router.get('/findings', async (req, res) => {
   const doc = await client.query(
-      Map(
-        Paginate(
-          Match(Index("all_findings"))
-        ),
-        Lambda("X", Get(Var("X")))
+    Map(
+      Paginate(
+        Filter(
+          Match(Index("findings_with_refs")),
+          Lambda(
+            ["name", "basicTag", "timeTag", "imageUrl", "ref"],
+            IsRef(Var("basicTag"))
+          )
+        )
+      ),
+      Lambda(
+        ["name", "basicTag", "timeTag", "imageUrl", "ref"],
+        {
+          findingDoc: Get(Var("ref")),
+          basicTag: Get(Var("basicTag")),
+          timeTag: Get(Var("timeTag")),
+        }
       )
+    )
     )
     .catch((e) => console.log(e));
         
