@@ -1,5 +1,6 @@
 'use strict';
 require('encoding');
+const googleStorage = require('@google-cloud/storage');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -8,16 +9,17 @@ const serverless = require('serverless-http');
 // init server app
 const app = express();
 app.use(express.json());
-// app.use(cors({origin: false}))
 
+// set cors
 const allowedOrigins = ['http://localhost:3000',
   'https://osobniarcheologie.netlify.app'];
+
 app.use(cors({
   origin: function(origin, callback){
     if(!origin) return callback(null, true);
     if(allowedOrigins.indexOf(origin) === -1){
       let msg = 'The CORS policy for this site does not ' +
-        'allow access from the specified Origin.';
+      'allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
@@ -26,6 +28,16 @@ app.use(cors({
 
 // read .env
 require('dotenv').config();
+
+const imageStorage = new googleStorage.Storage({
+  projectId: process.env.GOOGLE_PROJECT_ID,
+	credentials: {
+    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+		private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+	}
+});
+
+const findingBucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
 
 // init db client
 const faunadb = require('faunadb');
@@ -57,9 +69,7 @@ const {
 // init express router
 const router = express.Router();
 
-
 // FINDINGS
-
 // FINDINGS create
 router.post('/findings', async (req, res) => {
 
@@ -172,6 +182,16 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 // FINDINGS update
 
 // FINDINGS delete
+
+
+// FINDING IMAGE
+
+// FINDING IMAGE create
+router.post('/finding-image', async (req, res) => {
+  console.log('post image');
+
+
+})
 
 
 // TAGS
