@@ -63,7 +63,8 @@ const {
   Select,
   Var,
   Filter,
-  Function: Fn
+  Function: Fn,
+  Update
 } = faunadb.query;
 
 // init express router
@@ -141,7 +142,6 @@ router.get('/findings', async (req, res) => {
 
 // FINDINGS find by ID
 router.get('/finding/:id', async (req, res) => {
-  console.log("🚀 ~ file: server.js ~ line 41 ~ router.get ~ req", req)
 
   const doc = await client.query(
       Get(
@@ -186,12 +186,46 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 
 // FINDING IMAGE
 
+// FIXME: work bitch
 // FINDING IMAGE create
 router.post('/finding-image', async (req, res) => {
-  console.log('post image');
+  console.log('post image', JSON.stringify(req.body));
 
+  try {
 
-})
+    const document = await client.query(
+      Create(
+        Collection('images'),
+        {
+          data: {
+            status: 'UPLOADING'
+          }
+        }
+      )
+    );
+    
+    const documentId = document.ref.id;
+    console.log("req.body", req.body.image)
+    const bucket = await findingBucket.file(documentId + '.jpg').save(req.body.image).catch((e) => console.log(JSON.stringify(e)));
+    console.log("🚀 ~ file: server.js ~ line 209 ~ router.post ~ bucket", bucket)
+    
+
+    await client.query(
+      Update(
+        Ref(Collection('images'), documentId),
+        {
+          data: {
+            status: 'WAITING_FOR_THUMBNAIL'
+          }
+        }
+      )
+    );
+            
+    res.send({documentId});
+  } catch (e) {
+    console.log(e)
+  }
+});
 
 
 // TAGS
