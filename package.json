@@ -21,6 +21,7 @@
     "encoding": "^0.1.13",
     "express": "^4.17.1",
     "faunadb": "^4.3.0",
+    "multer": "^1.4.3",
     "netlify-lambda": "^2.0.14",
     "nodemon": "^2.0.12",
     "serverless-http": "^2.7.0"

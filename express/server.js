@@ -1,6 +1,7 @@
 'use strict';
 require('encoding');
-const googleStorage = require('@google-cloud/storage');
+const {Storage} = require('@google-cloud/storage');
+const processFile = require('../middleware/upload');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -8,7 +9,7 @@ const serverless = require('serverless-http');
 
 // init server app
 const app = express();
-app.use(express.json());
+// app.use(express.json());
 
 // set cors
 const allowedOrigins = ['http://localhost:3000',
@@ -29,15 +30,18 @@ app.use(cors({
 // read .env
 require('dotenv').config();
 
-const imageStorage = new googleStorage.Storage({
+// google cloud storage
+const imageStorage = new Storage({
+  // keyFilename
   projectId: process.env.GOOGLE_PROJECT_ID,
-	credentials: {
+  credentials: {
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-		private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
-	}
+    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+  }
 });
 
-const findingBucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
+const bucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
+// console.log("🚀 ~ file: server.js ~ line 194 ~ router.post ~ process.env.FINDING_BUCKET_NAME", process.env.FINDING_BUCKET_NAME, bucket)
 
 // init db client
 const faunadb = require('faunadb');
@@ -189,42 +193,90 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 // FIXME: work bitch
 // FINDING IMAGE create
 router.post('/finding-image', async (req, res) => {
-  console.log('post image', JSON.stringify(req.body));
+  // console.log('post image', req);
 
   try {
+    await processFile(req, res);
 
-    const document = await client.query(
-      Create(
-        Collection('images'),
-        {
-          data: {
-            status: 'UPLOADING'
-          }
-        }
-      )
-    );
-    
-    const documentId = document.ref.id;
-    console.log("req.body", req.body.image)
-    const bucket = await findingBucket.file(documentId + '.jpg').save(req.body.image).catch((e) => console.log(JSON.stringify(e)));
-    console.log("🚀 ~ file: server.js ~ line 209 ~ router.post ~ bucket", bucket)
-    
+    if (!req.file) {
+      return res.status(400).send({ message: "Please upload a file!" });
+    }
 
-    await client.query(
-      Update(
-        Ref(Collection('images'), documentId),
-        {
-          data: {
-            status: 'WAITING_FOR_THUMBNAIL'
-          }
-        }
-      )
-    );
-            
-    res.send({documentId});
-  } catch (e) {
-    console.log(e)
+    // Create a new blob in the bucket and upload the file data.
+    const blob = bucket.file(req.file.originalname);
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+    });
+
+    blobStream.on("error", (err) => {
+      res.status(500).send({ message: err.message });
+    });
+
+    blobStream.on("finish", async (data) => {
+      // Create URL for directly file access via HTTP.
+      const publicUrl = format(
+        `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+      );
+
+      try {
+        // Make the file public
+        await bucket.file(req.file.originalname).makePublic();
+      } catch {
+        return res.status(500).send({
+          message:
+            `Uploaded the file successfully: ${req.file.originalname}, but public access is denied!`,
+          url: publicUrl,
+        });
+      }
+
+      res.status(200).send({
+        message: "Uploaded the file successfully: " + req.file.originalname,
+        url: publicUrl,
+      });
+    });
+
+    blobStream.end(req.file.buffer);
+  } catch (err) {
+    res.status(500).send({
+      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+    });
   }
+
+  // TODO: old try
+  // try {
+
+  //   const document = await client.query(
+  //     Create(
+  //       Collection('images'),
+  //       {
+  //         data: {
+  //           status: 'UPLOADING'
+  //         }
+  //       }
+  //     )
+  //   );
+    
+  //   const documentId = document.ref.id;
+  //   // console.log("req.body.image", req.body)
+  //   await findingBucket.file(documentId + '.jpg').save(req.body).catch((e) => console.log('bucket file save error', JSON.stringify(e)));
+  //   // console.log("🚀 ~ file: server.js ~ line 216 ~ router.post ~ findingBucket", findingBucket)
+  //   // console.log("🚀 ~ file: server.js ~ line 209 ~ router.post ~ bucket", bucket)
+
+  //   await client.query(
+  //     Update(
+  //       Ref(Collection('images'), documentId),
+  //       {
+  //         data: {
+  //           status: 'WAITING_FOR_THUMBNAIL'
+  //         }
+  //       }
+  //     )
+  //   );
+            
+  //   res.send({documentId});
+  // } catch (e) {
+  //   console.log('post finding image error', e)
+  // }
 });
 
 
