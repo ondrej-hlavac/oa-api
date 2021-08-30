@@ -1,5 +1,8 @@
 'use strict';
 require('encoding');
+const {Storage} = require('@google-cloud/storage');
+const processFile = require('../middleware/upload');
+const { format } = require("util");
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -8,16 +11,17 @@ const serverless = require('serverless-http');
 // init server app
 const app = express();
 app.use(express.json());
-// app.use(cors({origin: false}))
 
+// set cors
 const allowedOrigins = ['http://localhost:3000',
   'https://osobniarcheologie.netlify.app'];
+
 app.use(cors({
   origin: function(origin, callback){
     if(!origin) return callback(null, true);
     if(allowedOrigins.indexOf(origin) === -1){
       let msg = 'The CORS policy for this site does not ' +
-        'allow access from the specified Origin.';
+      'allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
     return callback(null, true);
@@ -26,6 +30,19 @@ app.use(cors({
 
 // read .env
 require('dotenv').config();
+
+// google cloud storage
+const imageStorage = new Storage({
+  // keyFilename
+  projectId: process.env.GOOGLE_PROJECT_ID,
+  credentials: {
+    client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')
+  }
+});
+
+const bucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
+console.log("process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')", process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n'))
 
 // init db client
 const faunadb = require('faunadb');
@@ -51,15 +68,14 @@ const {
   Select,
   Var,
   Filter,
-  Function: Fn
+  Function: Fn,
+  Update
 } = faunadb.query;
 
 // init express router
 const router = express.Router();
 
-
 // FINDINGS
-
 // FINDINGS create
 router.post('/findings', async (req, res) => {
 
@@ -131,7 +147,6 @@ router.get('/findings', async (req, res) => {
 
 // FINDINGS find by ID
 router.get('/finding/:id', async (req, res) => {
-  console.log("🚀 ~ file: server.js ~ line 41 ~ router.get ~ req", req)
 
   const doc = await client.query(
       Get(
@@ -172,6 +187,104 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 // FINDINGS update
 
 // FINDINGS delete
+
+
+// FINDING IMAGE
+
+// FIXME: work bitch
+// FINDING IMAGE create
+router.post('/finding-image', async (req, res) => {
+  // console.log('post image', req);
+
+  try {
+    await processFile(req, res);
+
+    if (!req.file) {
+      return res.status(400).send({ message: "Please upload a file!" });
+    }
+
+    // Create a new blob in the bucket and upload the file data.
+    const blob = bucket.file(req.file.originalname);
+    const blobStream = blob.createWriteStream({
+      resumable: false,
+    });
+
+    blobStream.on("error", (err) => {
+      res.status(500).send({ message_blobStream: err.message });
+    });
+
+    blobStream.on("finish", async (data) => {
+      // Create URL for directly file access via HTTP.
+      const privateUrl = format(
+        `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+      );
+      
+      const publicUrl = format(
+        `https://storage.googleapis.com/finding_images_thumbnails/${blob.name}`
+      );
+
+      try {
+        // Make the file public
+        await bucket.file(req.file.originalname).makePublic();
+      } catch {
+        return res.status(201).send({
+          message:
+            `Uploaded the file successfully: ${req.file.originalname}, but public access is denied!`,
+          privateUrl: privateUrl,
+          publicUrl: publicUrl,
+          originalName: req.file.originalname,
+        });
+      }
+
+      res.status(200).send({
+        message: "Uploaded the file successfully: " + req.file.originalname,
+        url: publicUrl,
+      });
+    });
+
+    blobStream.end(req.file.buffer);
+  } catch (err) {
+    res.status(500).send({
+      message: `Could not upload the file: ${req.file.originalname}. ${err}`,
+    });
+  }
+
+  // TODO: old try
+  // try {
+
+  //   const document = await client.query(
+  //     Create(
+  //       Collection('images'),
+  //       {
+  //         data: {
+  //           status: 'UPLOADING'
+  //         }
+  //       }
+  //     )
+  //   );
+    
+  //   const documentId = document.ref.id;
+  //   // console.log("req.body.image", req.body)
+  //   await findingBucket.file(documentId + '.jpg').save(req.body).catch((e) => console.log('bucket file save error', JSON.stringify(e)));
+  //   // console.log("🚀 ~ file: server.js ~ line 216 ~ router.post ~ findingBucket", findingBucket)
+  //   // console.log("🚀 ~ file: server.js ~ line 209 ~ router.post ~ bucket", bucket)
+
+  //   await client.query(
+  //     Update(
+  //       Ref(Collection('images'), documentId),
+  //       {
+  //         data: {
+  //           status: 'WAITING_FOR_THUMBNAIL'
+  //         }
+  //       }
+  //     )
+  //   );
+            
+  //   res.send({documentId});
+  // } catch (e) {
+  //   console.log('post finding image error', e)
+  // }
+});
 
 
 // TAGS
