@@ -215,18 +215,24 @@ router.post('/finding-image', async (req, res) => {
 
     blobStream.on("finish", async (data) => {
       // Create URL for directly file access via HTTP.
-      const publicUrl = format(
+      const privateUrl = format(
         `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+      );
+      
+      const publicUrl = format(
+        `https://storage.googleapis.com/finding_images_thumbnails/${blob.name}`
       );
 
       try {
         // Make the file public
         await bucket.file(req.file.originalname).makePublic();
       } catch {
-        return res.status(500).send({
+        return res.status(201).send({
           message:
             `Uploaded the file successfully: ${req.file.originalname}, but public access is denied!`,
-          url: publicUrl,
+          privateUrl: privateUrl,
+          publicUrl: publicUrl,
+          originalName: req.file.originalname,
         });
       }
 
