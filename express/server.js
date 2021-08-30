@@ -2,6 +2,7 @@
 require('encoding');
 const {Storage} = require('@google-cloud/storage');
 const processFile = require('../middleware/upload');
+const { format } = require("util");
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -9,7 +10,7 @@ const serverless = require('serverless-http');
 
 // init server app
 const app = express();
-// app.use(express.json());
+app.use(express.json());
 
 // set cors
 const allowedOrigins = ['http://localhost:3000',
@@ -36,12 +37,12 @@ const imageStorage = new Storage({
   projectId: process.env.GOOGLE_PROJECT_ID,
   credentials: {
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY
+    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')
   }
 });
 
 const bucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
-// console.log("🚀 ~ file: server.js ~ line 194 ~ router.post ~ process.env.FINDING_BUCKET_NAME", process.env.FINDING_BUCKET_NAME, bucket)
+console.log("process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')", process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n'))
 
 // init db client
 const faunadb = require('faunadb');
@@ -209,7 +210,7 @@ router.post('/finding-image', async (req, res) => {
     });
 
     blobStream.on("error", (err) => {
-      res.status(500).send({ message: err.message });
+      res.status(500).send({ message_blobStream: err.message });
     });
 
     blobStream.on("finish", async (data) => {
