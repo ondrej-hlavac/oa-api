@@ -128,7 +128,8 @@ router.get('/findings', async (req, res) => {
             ["name", "basicTag", "timeTag", "imageUrl", "ref"],
             IsRef(Var("basicTag"))
           )
-        )
+        ),
+        { size: 400 }
       ),
       Lambda(
         ["name", "basicTag", "timeTag", "imageUrl", "ref"],
