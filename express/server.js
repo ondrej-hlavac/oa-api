@@ -13,8 +13,7 @@ const app = express();
 app.use(express.json());
 
 // set cors
-const allowedOrigins = ['http://localhost:3000',
-  'https://osobniarcheologie.netlify.app'];
+const allowedOrigins = ['http://localhost:3000', 'https://osobniarcheologie.com', 'https://www.osobniarcheologie.com'];
 
 app.use(cors({
   origin: function(origin, callback){
@@ -65,9 +64,11 @@ const {
   Ref,
   Collection,
   Lambda,
+  Let,
   Select,
   Var,
   Filter,
+  Documents,
   Function: Fn,
   Update
 } = faunadb.query;
@@ -150,6 +151,17 @@ router.get('/findings', async (req, res) => {
 router.get('/finding/:id', async (req, res) => {
 
   const doc = await client.query(
+      // Map(
+      //   Paginate(Documents(Collection('findings'),req.params.id)),
+      //   // and in this function, the magic will happen, for now we just return the tweet.
+      //   Lambda('f',
+      //     Let({
+      //         fweet: Get(Var('f'))
+      //       },
+      //       Var('fweet')
+      //     )
+      //   )
+      // )
       Get(
         Ref(
           Collection("findings"),
@@ -186,6 +198,9 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 })
 
 // FINDINGS update
+// router.put('/finding', async (req, res) => {
+
+// })
 
 // FINDINGS delete
 
