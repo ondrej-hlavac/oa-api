@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 
 // set cors
-const allowedOrigins = ['http://localhost:3000', 'https://osobniarcheologie.com', 'https://www.osobniarcheologie.com'];
+const allowedOrigins = ['http://localhost:3000', 'https://osobniarcheologie.com', 'https://www.osobniarcheologie.com', 'https://www.osobniarcheologie.cz', , 'https://osobniarcheologie.cz'];
 
 app.use(cors({
   origin: function(origin, callback){
