@@ -47,7 +47,7 @@ const imageStorage = new Storage({
 });
 
 const bucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
-console.log("process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')", process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n'))
+// console.log("process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')", process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n'))
 
 // init db client
 const faunadb = require('faunadb');
