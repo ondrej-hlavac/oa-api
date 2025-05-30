@@ -159,7 +159,7 @@ router.get("/finding/:id", async (req, res) => {
 
   const findingById = findingsData.data.find((finding) => finding.findingDoc.ref["@ref"].id === req.params.id);
 
-  return res.json({ data: findingById });
+  return res.json({ data: findingById.findingDoc.data });
 });
 
 // FINDINGS find by tag
