@@ -140,33 +140,37 @@ router.get("/findings", async (req, res) => {
 
 // FINDINGS find by ID
 router.get("/finding/:id", async (req, res) => {
-  const doc = await client
-    .query(
-      // Map(
-      //   Paginate(Documents(Collection('findings'),req.params.id)),
-      //   // and in this function, the magic will happen, for now we just return the tweet.
-      //   Lambda('f',
-      //     Let({
-      //         fweet: Get(Var('f'))
-      //       },
-      //       Var('fweet')
-      //     )
-      //   )
-      // )
-      Get(Ref(Collection("findings"), req.params.id))
-    )
-    .catch((e) => console.log(e));
+  // const doc = await client
+  //   .query(
+  //     // Map(
+  //     //   Paginate(Documents(Collection('findings'),req.params.id)),
+  //     //   // and in this function, the magic will happen, for now we just return the tweet.
+  //     //   Lambda('f',
+  //     //     Let({
+  //     //         fweet: Get(Var('f'))
+  //     //       },
+  //     //       Var('fweet')
+  //     //     )
+  //     //   )
+  //     // )
+  //     Get(Ref(Collection("findings"), req.params.id))
+  //   )
+  //   .catch((e) => console.log(e));
 
-  const findingById = findingsData.data.find((finding) => finding.ref["@ref"].id === req.params.id);
+  const findingById = findingsData.data.find((finding) => finding.findingDoc.ref["@ref"].id === req.params.id);
 
   return res.json(findingById);
 });
 
 // FINDINGS find by tag
 router.get("/findings-by-tag/:id", async (req, res) => {
-  const docs = await client
-    .query(Paginate(Join(Match(Index("findings_by_tag"), Get(Ref(Collection("findings"), req.params.id))), Index("findings"))))
-    .catch((e) => console.log(e));
+  // const docs = await client
+  //   .query(Paginate(Join(Match(Index("findings_by_tag"), Get(Ref(Collection("findings"), req.params.id))), Index("findings"))))
+  //   .catch((e) => console.log(e));
+
+  const docs = findingsData.data.filter(
+    (finding) => finding.basicTag.ref["@ref"].id === req.params.id || finding.timeTag.ref["@ref"].id === req.params.id
+  );
 
   res.json(docs);
 });
@@ -299,8 +303,9 @@ router.post("/tags", async (req, res) => {
 
 // TAGS read
 router.get("/tags", async (req, res) => {
-  const doc = await client.query(Map(Paginate(Match(Index("all_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
-  return res.json(doc);
+  // const doc = await client.query(Map(Paginate(Match(Index("all_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
+
+  return res.json(findingsTagsData);
 });
 
 // TAGS find by id
