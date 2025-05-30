@@ -310,7 +310,8 @@ router.get("/tags", async (req, res) => {
 
 // TAGS find by id
 router.get("/tag/:id", async (req, res) => {
-  const doc = await client.query(Get(Ref(Collection("tags"), req.params.id))).catch((e) => console.log(e));
+  // const doc = await client.query(Get(Ref(Collection("tags"), req.params.id))).catch((e) => console.log(e));
+  const doc = findingsTagsData.data.find((tag) => tag.ref["@ref"].id === req.params.id);
   return res.json(doc);
 });
 
@@ -343,13 +344,17 @@ router.post("/time-tags", async (req, res) => {
 
 // TIME TAGS read
 router.get("/time-tags", async (req, res) => {
-  const doc = await client.query(Map(Paginate(Match(Index("all_time_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
+  // const doc = await client.query(Map(Paginate(Match(Index("all_time_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
+
+  return res.json(findingsTimeTagsData);
   return res.json(doc);
 });
 
 // TIME TAGS find by id
 router.get("/time-tags/:id", async (req, res) => {
-  const doc = await client.query(Get(Ref(Collection("timeTags"), req.params.id))).catch((e) => console.log(e));
+  // const doc = await client.query(Get(Ref(Collection("timeTags"), req.params.id))).catch((e) => console.log(e));
+
+  const doc = findingsTimeTagsData.data.find((tag) => tag.ref["@ref"].id === req.params.id);
   return res.json(doc);
 });
 
