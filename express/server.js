@@ -1,12 +1,15 @@
-'use strict';
-require('encoding');
-const {Storage} = require('@google-cloud/storage');
-const processFile = require('../middleware/upload');
+"use strict";
+require("encoding");
+const { Storage } = require("@google-cloud/storage");
+const processFile = require("../middleware/upload");
 const { format } = require("util");
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const serverless = require('serverless-http');
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const serverless = require("serverless-http");
+const findingsData = require("../faunaBackup/findings.json");
+const findingsTagsData = require("../faunaBackup/tags.json");
+const findingsTimeTagsData = require("../faunaBackup/time-tags.json");
 
 // init server app
 const app = express();
@@ -14,27 +17,28 @@ app.use(express.json());
 
 // set cors
 const allowedOrigins = [
-  'http://localhost:3000',
-  'https://osobniarcheologie.com',
-  'https://www.osobniarcheologie.com',
-  'https://www.osobniarcheologie.cz',
-  'https://osobniarcheologie.cz'
+  "http://localhost:3000",
+  "https://osobniarcheologie.com",
+  "https://www.osobniarcheologie.com",
+  "https://www.osobniarcheologie.cz",
+  "https://osobniarcheologie.cz",
 ];
 
-app.use(cors({
-  origin: function(origin, callback){
-    if(!origin) return callback(null, true);
-    if(allowedOrigins.indexOf(origin) === -1){
-      let msg = 'The CORS policy for this site does not ' +
-      'allow access from the specified Origin!';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
-  }
-}));
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        let msg = "The CORS policy for this site does not " + "allow access from the specified Origin!";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 // read .env
-require('dotenv').config();
+require("dotenv").config();
 
 // google cloud storage
 const imageStorage = new Storage({
@@ -42,19 +46,19 @@ const imageStorage = new Storage({
   projectId: process.env.GOOGLE_PROJECT_ID,
   credentials: {
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')
-  }
+    private_key: process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, "\n"),
+  },
 });
 
 const bucket = imageStorage.bucket(process.env.FINDING_BUCKET_NAME);
 // console.log("process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n')", process.env.GOOGLE_SERVICE_ACCOUNT_KEY.replace(/\\n/gm, '\n'))
 
 // init db client
-const faunadb = require('faunadb');
-const client = new faunadb.Client({ 
+const faunadb = require("faunadb");
+const client = new faunadb.Client({
   secret: process.env.FAUNADB_SECRET,
-  domain: 'db.eu.fauna.com',
-  scheme: 'https', 
+  domain: "db.eu.fauna.com",
+  scheme: "https",
 });
 
 // // db queries
@@ -76,7 +80,7 @@ const {
   Filter,
   Documents,
   Function: Fn,
-  Update
+  Update,
 } = faunadb.query;
 
 // init express router
@@ -84,8 +88,7 @@ const router = express.Router();
 
 // FINDINGS
 // FINDINGS create
-router.post('/findings', async (req, res) => {
-
+router.post("/findings", async (req, res) => {
   // if (!req.headers.authentication) {
   //   res.send(400, 'missing authorization header');
   // }
@@ -97,66 +100,48 @@ router.post('/findings', async (req, res) => {
   // const { tags } = params;
   const { basicTagId, timeTagId } = req.body;
 
-  const doc = await client.query(
-    Create(
-      Collection('findings'),
-      {
+  const doc = await client
+    .query(
+      Create(Collection("findings"), {
         data: {
           ...req.body,
-          basicTag: Select('ref', Get(
-            Ref(
-              Collection("tags"),
-              basicTagId
-            )
-          )),
-          timeTag: Select('ref', Get(
-            Ref(
-              Collection("timeTags"),
-              timeTagId
-            )
-          )),
-        }
-      }
+          basicTag: Select("ref", Get(Ref(Collection("tags"), basicTagId))),
+          timeTag: Select("ref", Get(Ref(Collection("timeTags"), timeTagId))),
+        },
+      })
     )
-  )
-    .catch((e) => res.send(e))
+    .catch((e) => res.send(e));
 
   res.send(doc);
 });
 
 // FINDINGS read
-router.get('/findings', async (req, res) => {
-  const doc = await client.query(
-    Map(
-      Paginate(
-        Filter(
-          Match(Index("findings_with_refs")),
-          Lambda(
-            ["name", "basicTag", "timeTag", "imageUrl", "ref"],
-            IsRef(Var("basicTag"))
-          )
-        ),
-        { size: 400 }
-      ),
-      Lambda(
-        ["name", "basicTag", "timeTag", "imageUrl", "ref"],
-        {
-          findingDoc: Get(Var("ref")),
-          basicTag: Get(Var("basicTag")),
-          timeTag: Get(Var("timeTag")),
-        }
-      )
-    )
-    )
-    .catch((e) => console.log(e));
-        
+router.get("/findings", async (req, res) => {
+  console.log("get findings");
+  // const doc = await client
+  //   .query(
+  //     Map(
+  //       Paginate(
+  //         Filter(Match(Index("findings_with_refs")), Lambda(["name", "basicTag", "timeTag", "imageUrl", "ref"], IsRef(Var("basicTag")))),
+  //         { size: 400 }
+  //       ),
+  //       Lambda(["name", "basicTag", "timeTag", "imageUrl", "ref"], {
+  //         findingDoc: Get(Var("ref")),
+  //         basicTag: Get(Var("basicTag")),
+  //         timeTag: Get(Var("timeTag")),
+  //       })
+  //     )
+  //   )
+  //   .catch((e) => console.log(e));
+
+  return res.json(findingsData);
   return res.json(doc);
 });
 
 // FINDINGS find by ID
-router.get('/finding/:id', async (req, res) => {
-
-  const doc = await client.query(
+router.get("/finding/:id", async (req, res) => {
+  const doc = await client
+    .query(
       // Map(
       //   Paginate(Documents(Collection('findings'),req.params.id)),
       //   // and in this function, the magic will happen, for now we just return the tweet.
@@ -168,40 +153,23 @@ router.get('/finding/:id', async (req, res) => {
       //     )
       //   )
       // )
-      Get(
-        Ref(
-          Collection("findings"),
-          req.params.id
-        )
-      )
+      Get(Ref(Collection("findings"), req.params.id))
     )
     .catch((e) => console.log(e));
-        
-  return res.json(doc);
+
+  const findingById = findingsData.data.find((finding) => finding.ref["@ref"].id === req.params.id);
+
+  return res.json(findingById);
 });
 
 // FINDINGS find by tag
-router.get('/findings-by-tag/:id', async (req, res) => {
+router.get("/findings-by-tag/:id", async (req, res) => {
+  const docs = await client
+    .query(Paginate(Join(Match(Index("findings_by_tag"), Get(Ref(Collection("findings"), req.params.id))), Index("findings"))))
+    .catch((e) => console.log(e));
 
-  const docs = await client.query(
-    Paginate(
-      Join(
-        Match(
-          Index('findings_by_tag'),
-          Get(
-            Ref(
-              Collection("findings"),
-              req.params.id
-            )
-          )
-        ),
-        Index("findings")
-      )
-    )
-  ).catch((e) => console.log(e));
-  
-  res.json(docs)
-})
+  res.json(docs);
+});
 
 // FINDINGS update
 // router.put('/finding', async (req, res) => {
@@ -210,12 +178,11 @@ router.get('/findings-by-tag/:id', async (req, res) => {
 
 // FINDINGS delete
 
-
 // FINDING IMAGE
 
 // FIXME: work bitch
 // FINDING IMAGE create
-router.post('/finding-image', async (req, res) => {
+router.post("/finding-image", async (req, res) => {
   // console.log('post image', req);
 
   try {
@@ -237,21 +204,16 @@ router.post('/finding-image', async (req, res) => {
 
     blobStream.on("finish", async (data) => {
       // Create URL for directly file access via HTTP.
-      const privateUrl = format(
-        `https://storage.googleapis.com/${bucket.name}/${blob.name}`
-      );
-      
-      const publicUrl = format(
-        `https://storage.googleapis.com/finding_images_thumbnails/${blob.name}`
-      );
+      const privateUrl = format(`https://storage.googleapis.com/${bucket.name}/${blob.name}`);
+
+      const publicUrl = format(`https://storage.googleapis.com/finding_images_thumbnails/${blob.name}`);
 
       try {
         // Make the file public
         await bucket.file(req.file.originalname).makePublic();
       } catch {
         return res.status(201).send({
-          message:
-            `Uploaded the file successfully: ${req.file.originalname}, but public access is denied!`,
+          message: `Uploaded the file successfully: ${req.file.originalname}, but public access is denied!`,
           privateUrl: privateUrl,
           publicUrl: publicUrl,
           originalName: req.file.originalname,
@@ -284,7 +246,7 @@ router.post('/finding-image', async (req, res) => {
   //       }
   //     )
   //   );
-    
+
   //   const documentId = document.ref.id;
   //   // console.log("req.body.image", req.body)
   //   await findingBucket.file(documentId + '.jpg').save(req.body).catch((e) => console.log('bucket file save error', JSON.stringify(e)));
@@ -301,20 +263,18 @@ router.post('/finding-image', async (req, res) => {
   //       }
   //     )
   //   );
-            
+
   //   res.send({documentId});
   // } catch (e) {
   //   console.log('post finding image error', e)
   // }
 });
 
-
 // TAGS
 
 // TAGS create
-router.post('/tags', async (req, res) => {
-
-  console.log('post taks')
+router.post("/tags", async (req, res) => {
+  console.log("post taks");
 
   // if (!req.headers.authentication) {
   //   res.send(400, 'missing authorization header');
@@ -324,53 +284,36 @@ router.post('/tags', async (req, res) => {
   //   res.send(401, 'unauthorized request');
   // }
 
-  const doc = await client.query(
-    Create(
-      Collection('tags'),
-      {
+  const doc = await client
+    .query(
+      Create(Collection("tags"), {
         data: {
-          ...req.body
-        }
-      }
+          ...req.body,
+        },
+      })
     )
-  )
-  .catch((e) => res.send(e))
+    .catch((e) => res.send(e));
 
   res.send(doc);
 });
 
 // TAGS read
-router.get('/tags', async (req, res) => {
-  const doc = await client.query(
-      Map(
-        Paginate(
-          Match(Index("all_tags"))
-        ),
-        Lambda("X", Get(Var("X")))
-      )
-    ).catch((e) => console.log(e));
+router.get("/tags", async (req, res) => {
+  const doc = await client.query(Map(Paginate(Match(Index("all_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
   return res.json(doc);
 });
 
 // TAGS find by id
-router.get('/tag/:id', async (req, res) => {
-  const doc = await client.query(
-      Get(
-        Ref(
-          Collection("tags"),
-          req.params.id
-        )
-      )
-    ).catch((e) => console.log(e));
+router.get("/tag/:id", async (req, res) => {
+  const doc = await client.query(Get(Ref(Collection("tags"), req.params.id))).catch((e) => console.log(e));
   return res.json(doc);
 });
 
 // TIME TAGS
 
 // TIME TAGS create
-router.post('/time-tags', async (req, res) => {
-
-  console.log('post taks')
+router.post("/time-tags", async (req, res) => {
+  console.log("post taks");
 
   // if (!req.headers.authentication) {
   //   res.send(400, 'missing authorization header');
@@ -380,52 +323,35 @@ router.post('/time-tags', async (req, res) => {
   //   res.send(401, 'unauthorized request');
   // }
 
-  const doc = await client.query(
-    Create(
-      Collection('timeTags'),
-      {
+  const doc = await client
+    .query(
+      Create(Collection("timeTags"), {
         data: {
-          ...req.body
-        }
-      }
+          ...req.body,
+        },
+      })
     )
-  )
-  .catch((e) => res.send(e))
+    .catch((e) => res.send(e));
 
   res.send(doc);
 });
 
 // TIME TAGS read
-router.get('/time-tags', async (req, res) => {
-  const doc = await client.query(
-      Map(
-        Paginate(
-          Match(Index("all_time_tags"))
-        ),
-        Lambda("X", Get(Var("X")))
-      )
-    ).catch((e) => console.log(e));
+router.get("/time-tags", async (req, res) => {
+  const doc = await client.query(Map(Paginate(Match(Index("all_time_tags"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
   return res.json(doc);
 });
 
 // TIME TAGS find by id
-router.get('/time-tags/:id', async (req, res) => {
-  const doc = await client.query(
-      Get(
-        Ref(
-          Collection("timeTags"),
-          req.params.id
-        )
-      )
-    ).catch((e) => console.log(e));
+router.get("/time-tags/:id", async (req, res) => {
+  const doc = await client.query(Get(Ref(Collection("timeTags"), req.params.id))).catch((e) => console.log(e));
   return res.json(doc);
 });
 
 // RELATIONS
 
 // RELATION create
-router.post('/relation', async (req, res) => {
-
+router.post("/relation", async (req, res) => {
   // if (!req.headers.authentication) {
   //   res.send(400, 'missing authorization header');
   // }
@@ -439,63 +365,41 @@ router.post('/relation', async (req, res) => {
   // const connectionFinding = Select('ref', Get(Match(Index('findings'), finding)));
   // const connectionTag = Select('ref', Get(Match(Index('tags'), tag)));
 
-  const doc = await client.query(
-    Create(
-      Collection('relations'),
-      {
+  const doc = await client
+    .query(
+      Create(Collection("relations"), {
         data: {
-          finding: Select('ref', Get(
-            Ref(
-              Collection("findings"),
-              finding
-            )
-          )),
-          tag: Select('ref', Get(
-            Ref(
-              Collection("tags"),
-              tag
-            )
-          )),
-        }
-      }
+          finding: Select("ref", Get(Ref(Collection("findings"), finding))),
+          tag: Select("ref", Get(Ref(Collection("tags"), tag))),
+        },
+      })
     )
-  )
-  .catch((e) => res.send(e))
+    .catch((e) => res.send(e));
 
   res.send(doc);
 });
 
 // RELATION read
-router.get('/relations', async (req, res) => {
-  const doc = await client.query(
-      Map(
-        Paginate(
-          Match(Index("all_relations"))
-        ),
-        Lambda("X", Get(Var("X")))
-      )
-    ).catch((e) => console.log(e));
+router.get("/relations", async (req, res) => {
+  const doc = await client.query(Map(Paginate(Match(Index("all_relations"))), Lambda("X", Get(Var("X"))))).catch((e) => console.log(e));
   return res.json(doc);
 });
 
 // RELATION delete
-router.delete('/relation', async (req, res) => {
-  const doc = await client.query(
-    Delete(q.Ref(q.Collection('relations'), req.body.id))
-  )
+router.delete("/relation", async (req, res) => {
+  const doc = await client.query(Delete(q.Ref(q.Collection("relations"), req.body.id)));
 
   res.send(doc);
-})
-
+});
 
 // base route
-router.get('/', async (req, res) => {
-  res.send(`Osobní Archeologie API is running well.`)
+router.get("/", async (req, res) => {
+  res.send(`Osobní Archeologie API is running well.`);
 });
 
 // server use lambda
-app.use('/.netlify/functions/server', router);  // path must route to lambda
-app.use('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));
+app.use("/.netlify/functions/server", router); // path must route to lambda
+app.use("/", (req, res) => res.sendFile(path.join(__dirname, "../index.html")));
 
 // export server module
 module.exports = app;

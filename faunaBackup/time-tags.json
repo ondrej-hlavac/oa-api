@@ -1,0 +1,556 @@
+{
+  "data": [
+    {
+      "ref": {
+        "@ref": {
+          "id": "307666291010830535",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629672289780000,
+      "data": {
+        "name": "2010_17let",
+        "color": "282828",
+        "year": "2010",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "307677263809216711",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629682754260000,
+      "data": {
+        "name": "2002_9let",
+        "color": "9CAF88",
+        "year": "2002",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "307705138430083266",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629709337550000,
+      "data": {
+        "name": "2021_28let",
+        "color": "00E0B5",
+        "year": "2021",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "307811039595987142",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629838344970000,
+      "data": {
+        "name": "1993_0let",
+        "color": "4287f0",
+        "year": "1993",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308374106113310918",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630347314860000,
+      "data": {
+        "name": "2019_26let",
+        "color": "4e88e9",
+        "year": "2019",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308374297152323778",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630347497040000,
+      "data": {
+        "name": "2013_20let",
+        "color": "9fae8c",
+        "year": "2013",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308374388391018694",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630347584070000,
+      "data": {
+        "name": "2020_27let",
+        "color": "a67dff",
+        "year": "2020",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308374470797557953",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630347662700000,
+      "data": {
+        "name": "2020_27let",
+        "color": "3c9a8d",
+        "year": "2020",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431374837088449",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630401930570000,
+      "data": {
+        "name": "2018_25let",
+        "color": "fc8896",
+        "year": "2018",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431404335628481",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630401958710000,
+      "data": {
+        "name": "2017_24let",
+        "color": "492fa8",
+        "year": "2017",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431445213315265",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630401997680000,
+      "data": {
+        "name": "2016_23let",
+        "color": "00dee1",
+        "year": "2016",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431480169693377",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402031030000,
+      "data": {
+        "name": "2015_22let",
+        "color": "c240ff",
+        "year": "2015",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431496318812353",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402046420000,
+      "data": {
+        "name": "2014_21let",
+        "color": "bf2b40",
+        "year": "2014",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431877231870146",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402409700000,
+      "data": {
+        "name": "2013_20let",
+        "color": "4d7c61",
+        "year": "2013",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431908768841926",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402439800000,
+      "data": {
+        "name": "2012_19let",
+        "color": "83a8e2",
+        "year": "2012",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308431935272648902",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402465030000,
+      "data": {
+        "name": "2011_18let",
+        "color": "9e239e",
+        "year": "2011",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432330457874625",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402842050000,
+      "data": {
+        "name": "2010_17let",
+        "color": "ff2e92",
+        "year": "2010",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432351927468225",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402862390000,
+      "data": {
+        "name": "2009_16let",
+        "color": "5fff43",
+        "year": "2009",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432374592438470",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630402884010000,
+      "data": {
+        "name": "2008_15let",
+        "color": "601d2a",
+        "year": "2008",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432515659464897",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630403018540000,
+      "data": {
+        "name": "2007_14let",
+        "color": "cde200",
+        "year": "2007",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432535169269958",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630403037150000,
+      "data": {
+        "name": "2006_13let",
+        "color": "a06483",
+        "year": "2006",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432561263083714",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630403062030000,
+      "data": {
+        "name": "2005_12let",
+        "color": "99743f",
+        "year": "2005",
+        "dateTag": true
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308432604915302593",
+          "collection": {
+            "@ref": {
+              "id": "timeTags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630403103670000,
+      "data": {
+        "name": "2004_11let",
+        "color": "0010d1",
+        "year": "2004",
+        "dateTag": true
+      }
+    }
+  ]
+}

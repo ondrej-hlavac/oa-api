@@ -1,0 +1,92 @@
+{
+  "data": [
+    {
+      "ref": {
+        "@ref": {
+          "id": "307704985972375745",
+          "collection": {
+            "@ref": {
+              "id": "tags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629709192160000,
+      "data": {
+        "name": "boyfriends",
+        "color": "84E684"
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "307705029281710278",
+          "collection": {
+            "@ref": {
+              "id": "tags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629709233460000,
+      "data": {
+        "name": "family",
+        "color": "9F85E5"
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "307705071613771970",
+          "collection": {
+            "@ref": {
+              "id": "tags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1629709273840000,
+      "data": {
+        "name": "friends",
+        "color": "E2B700"
+      }
+    },
+    {
+      "ref": {
+        "@ref": {
+          "id": "308372657073553602",
+          "collection": {
+            "@ref": {
+              "id": "tags",
+              "collection": {
+                "@ref": {
+                  "id": "collections"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ts": 1630345932940000,
+      "data": {
+        "name": "own",
+        "color": "7bbaff"
+      }
+    }
+  ]
+}
