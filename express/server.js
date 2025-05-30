@@ -172,7 +172,7 @@ router.get("/findings-by-tag/:id", async (req, res) => {
     (finding) => finding.basicTag.ref["@ref"].id === req.params.id || finding.timeTag.ref["@ref"].id === req.params.id
   );
 
-  res.json(docs);
+  res.json({ data: docs });
 });
 
 // FINDINGS update
